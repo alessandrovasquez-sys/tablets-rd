@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Escáner QR - Inventario Tablets</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; min-height: 100vh; }
+  header { background: #4338ca; color: white; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+  header h1 { font-size: 1.2rem; font-weight: 700; }
+  header p  { font-size: 0.78rem; color: #c7d2fe; margin-top: 2px; }
+  .container { max-width: 540px; margin: 24px auto; padding: 0 16px; display: flex; flex-direction: column; gap: 16px; }
+  .card { background: white; border-radius: 14px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .card h2 { font-size: 0.95rem; font-weight: 700; color: #1e293b; margin-bottom: 14px; }
+  #reader { width: 100%; border-radius: 10px; overflow: hidden; }
+  .btn-primary { width: 100%; padding: 10px; border-radius: 10px; border: none; background: #4338ca; color: white; font-weight: 700; font-size: 0.9rem; cursor: pointer; margin-top: 12px; }
+  .btn-primary:hover { background: #3730a3; }
+  .btn-secondary { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #e2e8f0; color: #475569; background: white; font-weight: 600; font-size: 0.9rem; cursor: pointer; margin-top: 8px; }
+  .btn-secondary:hover { background: #f1f5f9; }
+  #manualInput input { width: 100%; padding: 9px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.85rem; outline: none; margin-bottom: 8px; }
+  #manualInput input:focus { border-color: #6366f1; box-shadow: 0 0 0 2px #e0e7ff; }
+  .alert { padding: 10px 14px; border-radius: 10px; font-size: 0.82rem; font-weight: 600; margin-top: 10px; }
+  .alert-ok   { background: #dcfce7; color: #166534; }
+  .alert-err  { background: #fee2e2; color: #991b1b; }
+  .alert-warn { background: #fef9c3; color: #854d0e; }
+  /* MODAL RESULTADO */
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; }
+  .overlay.active { display: flex; }
+  .modal { background: white; border-radius: 18px; padding: 28px; width: 100%; max-width: 420px; margin: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+  .modal-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .modal-icon { font-size: 2.5rem; }
+  .modal-title { font-size: 1.15rem; font-weight: 800; color: #1e293b; }
+  .modal-sub   { font-size: 0.78rem; color: #64748b; margin-top: 2px; }
+  .info-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
+  .info-row:last-child { border-bottom: none; }
+  .info-label { color: #64748b; font-weight: 600; }
+  .info-val   { color: #1e293b; font-weight: 700; text-align: right; max-width: 60%; }
+  .badge { padding: 3px 12px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; }
+  .b-Bueno        { background: #dcfce7; color: #166534; }
+  .b-Regular       { background: #fef9c3; color: #854d0e; }
+  .b-Dañado        { background: #fee2e2; color: #991b1b; }
+  .b-EnReparacion  { background: #dbeafe; color: #1e40af; }
+  .b-Baja          { background: #e2e8f0; color: #475569; }
+  .modal-actions { margin-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>📱 Escáner QR</h1>
+    <p>Inventario de Tablets en Campo</p>
+  </div>
+</header>
+
+<div class="container">
+  <div class="card">
+    <h2>📷 Escanear código QR</h2>
+    <div id="reader"></div>
+    <div id="scanAlert"></div>
+    <button class="btn-secondary" onclick="toggleManual()">✏️ Ingresar serie manualmente</button>
+  </div>
+
+  <div class="card" id="manualCard" style="display:none;">
+    <h2>✏️ Búsqueda manual</h2>
+    <div id="manualInput">
+      <input id="manualSerie" type="text" placeholder="Número de serie..."/>
+      <button class="btn-primary" onclick="buscarManual()">Buscar</button>
+      <button class="btn-secondary" onclick="toggleManual()">Volver al escáner</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL VENTANA EMERGENTE -->
+<div class="overlay" id="overlayResult">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-icon">📱</div>
+      <div>
+        <div class="modal-title" id="mNombre"></div>
+        <div class="modal-sub"   id="mSerie"></div>
+      </div>
+    </div>
+    <div id="mInfo"></div>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="cerrarModal()">✅ Cerrar</button>
+      <button class="btn-secondary" onclick="cerrarModal()">🔄 Escanear otro</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const BIN_ID  = "699dc73743b1c97be999f46f";
+  const API_KEY = "$2a$10$sIxUKUhDKyvNvhdedW2XX.rYODI2GsngOLf.XWGOWlFQEcrQrIRga";
+  const BASE    = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+
+  let tablets = [];
+  let scanner = null;
+
+  const $ = id => document.getElementById(id);
+  const badgeClass = e => "badge b-" + e.replace(/\s/g,"");
+
+  async function cargarTablets() {
+    try {
+      const r = await fetch(BASE + "/latest", { headers: { "X-Master-Key": API_KEY } });
+      const d = await r.json();
+      tablets = d.record.tablets || [];
+    } catch(e) { tablets = []; }
+  }
+
+  function alerta(id, msg, tipo) {
+    const el = $(id);
+    el.innerHTML = `<div class="alert alert-${tipo}">${msg}</div>`;
+    setTimeout(() => el.innerHTML = "", 3500);
+  }
+
+  function mostrarModal(t) {
+    $("mNombre").textContent = t.marca + " " + t.modelo;
+    $("mSerie").textContent  = "Serie: " + t.serie;
+    const rows = [
+      ["👤 Asignado a", t.asignado],
+      ["🏢 Área",       t.area || "—"],
+      ["📍 Ubicación",  t.ubicacion || "—"],
+      ["🔧 Estado",     `<span class="${badgeClass(t.estado)}">${t.estado}</span>`],
+      ["📝 Obs.",       t.obs || "—"],
+    ];
+    $("mInfo").innerHTML = rows.map(([l,v]) =>
+      `<div class="info-row"><span class="info-label">${l}</span><span class="info-val">${v}</span></div>`
+    ).join("");
+    $("overlayResult").classList.add("active");
+  }
+
+  function cerrarModal() {
+    $("overlayResult").classList.remove("active");
+  }
+
+  async function buscar(serie) {
+    await cargarTablets();
+    const q = serie.trim().toLowerCase();
+    return tablets.find(t =>
+      (t.serie||"").toLowerCase() === q ||
+      (t.serie||"").toLowerCase().includes(q)
+    );
+  }
+
+  async function onScanSuccess(txt) {
+    stopScanner();
+    // Si el QR contiene una URL, extraer el parámetro serie
+    try {
+      const url = new URL(txt);
+      const s = url.searchParams.get("serie");
+      if (s) txt = s;
+    } catch(e) {}
+    const found = await buscar(txt);
+    if (found) {
+      mostrarModal(found);
+    } else {
+      alerta("scanAlert", `⚠️ No se encontró tablet con código: <b>${txt}</b>`, "warn");
+      setTimeout(iniciarScanner, 2000);
+    }
+  }
+
+  function iniciarScanner() {
+    scanner = new Html5Qrcode("reader");
+    scanner.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      onScanSuccess,
+      () => {}
+    ).catch(() => {
+      alerta("scanAlert", "❌ No se pudo acceder a la cámara. Usa la búsqueda manual.", "err");
+    });
+  }
+
+  function stopScanner() {
+    if (scanner) { scanner.stop().catch(()=>{}); scanner = null; }
+  }
+
+  function toggleManual() {
+    const m = $("manualCard");
+    const visible = m.style.display !== "none";
+    if (visible) {
+      m.style.display = "none";
+      setTimeout(iniciarScanner, 300);
+    } else {
+      m.style.display = "block";
+      stopScanner();
+    }
+  }
+
+  async function buscarManual() {
+    const val = $("manualSerie").value.trim();
+    if (!val) return;
+    const found = await buscar(val);
+    if (found) {
+      mostrarModal(found);
+    } else {
+      alerta("scanAlert", `⚠️ No se encontró tablet: <b>${val}</b>`, "warn");
+    }
+  }
+
+  $("manualSerie").addEventListener("keydown", e => { if(e.key==="Enter") buscarManual(); });
+  $("overlayResult").addEventListener("click", e => { if(e.target===$("overlayResult")) { cerrarModal(); setTimeout(iniciarScanner,300); } });
+
+  iniciarScanner();
+</script>
+</body>
+</html>
