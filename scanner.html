@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Escáner QR - Inventario Tablets</title>
+<title>Escáner QR - Inventario de Equipos</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -25,33 +25,55 @@
   .alert-ok   { background: #dcfce7; color: #166534; }
   .alert-err  { background: #fee2e2; color: #991b1b; }
   .alert-warn { background: #fef9c3; color: #854d0e; }
+
   /* MODAL RESULTADO */
-  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; }
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; padding: 16px; }
   .overlay.active { display: flex; }
-  .modal { background: white; border-radius: 18px; padding: 28px; width: 100%; max-width: 420px; margin: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
-  .modal-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
-  .modal-icon { font-size: 2.5rem; }
-  .modal-title { font-size: 1.15rem; font-weight: 800; color: #1e293b; }
+  .modal { background: white; border-radius: 18px; padding: 24px; width: 100%; max-width: 440px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
+  .modal-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+  .modal-icon { font-size: 2.2rem; }
+  .modal-title { font-size: 1.1rem; font-weight: 800; color: #1e293b; }
   .modal-sub   { font-size: 0.78rem; color: #64748b; margin-top: 2px; }
-  .info-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
+  .tipo-pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 0.7rem; font-weight: 700; background: #e0f2fe; color: #075985; margin-bottom: 8px; }
+
+  .section-title { font-size: 0.72rem; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: .05em; margin: 14px 0 8px; border-top: 1px solid #f1f5f9; padding-top: 10px; }
+  .info-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 7px 0; border-bottom: 1px solid #f8fafc; font-size: 0.84rem; gap: 12px; }
   .info-row:last-child { border-bottom: none; }
-  .info-label { color: #64748b; font-weight: 600; }
-  .info-val   { color: #1e293b; font-weight: 700; text-align: right; max-width: 60%; }
+  .info-label { color: #64748b; font-weight: 600; flex-shrink: 0; }
+  .info-val   { color: #1e293b; font-weight: 700; text-align: right; }
   .badge { padding: 3px 12px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; }
   .b-Bueno        { background: #dcfce7; color: #166534; }
   .b-Regular       { background: #fef9c3; color: #854d0e; }
   .b-Dañado        { background: #fee2e2; color: #991b1b; }
   .b-EnReparacion  { background: #dbeafe; color: #1e40af; }
   .b-Baja          { background: #e2e8f0; color: #475569; }
-  .modal-actions { margin-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+  .chips-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
+  .chip { font-size: .7rem; padding: 2px 8px; border-radius: 999px; border: 1px solid #e2e8f0; color: #475569; background: #f8fafc; }
+  .chip.ok { border-color: #bbf7d0; color: #166534; background: #f0fdf4; }
+  .chip.no { border-color: #fecaca; color: #991b1b; background: #fff5f5; }
+  .tags-row { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .tag { font-size: .68rem; padding: 2px 8px; border-radius: 999px; font-weight: 600; }
+  .tag-var { background: #ede9fe; color: #5b21b6; }
+  .tag-est { background: #e0f2fe; color: #075985; }
+  .tag-app { background: #fef3c7; color: #92400e; }
+
+  .modal-actions { margin-top: 18px; display: flex; flex-direction: column; gap: 8px; }
+
+  /* EDITOR DE ESTADO */
+  #estadoEditor { display: none; margin-top: 14px; border-top: 1px solid #f1f5f9; padding-top: 14px; }
+  #estadoEditor h3 { font-size: .88rem; font-weight: 700; color: #1e293b; margin-bottom: 10px; }
+  #estadoEditor select, #estadoEditor textarea { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px; font-size: .84rem; font-family: inherit; outline: none; margin-bottom: 8px; }
+  #estadoEditor textarea { resize: none; height: 60px; }
+  #estadoEditor select:focus, #estadoEditor textarea:focus { border-color: #6366f1; box-shadow: 0 0 0 2px #e0e7ff; }
+  #saveAlert { margin-top: 6px; }
 </style>
 </head>
 <body>
 
 <header>
   <div>
-    <h1>📱 Escáner QR</h1>
-    <p>Inventario de Tablets en Campo</p>
+    <h1>🔍 Escáner QR</h1>
+    <p>Inventario de Equipos en Campo</p>
   </div>
 </header>
 
@@ -66,26 +88,41 @@
   <div class="card" id="manualCard" style="display:none;">
     <h2>✏️ Búsqueda manual</h2>
     <div id="manualInput">
-      <input id="manualSerie" type="text" placeholder="Número de serie..."/>
+      <input id="manualSerie" type="text" placeholder="Número de serie o nombre del equipo..."/>
       <button class="btn-primary" onclick="buscarManual()">Buscar</button>
       <button class="btn-secondary" onclick="toggleManual()">Volver al escáner</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL VENTANA EMERGENTE -->
+<!-- MODAL RESULTADO -->
 <div class="overlay" id="overlayResult">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-icon">📱</div>
+      <div class="modal-icon" id="mIcon">📱</div>
       <div>
+        <div class="tipo-pill" id="mTipo">Tablet</div>
         <div class="modal-title" id="mNombre"></div>
         <div class="modal-sub"   id="mSerie"></div>
       </div>
     </div>
     <div id="mInfo"></div>
+
+    <!-- EDITOR DE ESTADO -->
+    <div id="estadoEditor">
+      <h3>✏️ Actualizar estado</h3>
+      <select id="nuevoEstado">
+        <option>Bueno</option><option>Regular</option><option>Dañado</option>
+        <option>En reparación</option><option>Baja</option>
+      </select>
+      <textarea id="nuevaObs" placeholder="Observaciones (opcional)..."></textarea>
+      <button class="btn-primary" onclick="guardarCambio()">💾 Guardar cambio</button>
+      <button class="btn-secondary" onclick="document.getElementById('estadoEditor').style.display='none'">Cancelar</button>
+      <div id="saveAlert"></div>
+    </div>
+
     <div class="modal-actions">
-      <button class="btn-primary" onclick="cerrarModal()">✅ Cerrar</button>
+      <button class="btn-primary" onclick="mostrarEditor()">✏️ Actualizar estado</button>
       <button class="btn-secondary" onclick="cerrarModal()">🔄 Escanear otro</button>
     </div>
   </div>
@@ -95,19 +132,34 @@
   const BIN_ID  = "699dc73743b1c97be999f46f";
   const API_KEY = "$2a$10$sIxUKUhDKyvNvhdedW2XX.rYODI2GsngOLf.XWGOWlFQEcrQrIRga";
   const BASE    = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+  const HEADERS = {"Content-Type":"application/json","X-Master-Key":API_KEY};
+
+  const APPS = [{id:"appDropbox",label:"Dropbox"},{id:"appKobo",label:"KoBoToolbox"},{id:"appField",label:"Fieldbook"}];
+  const TIPO_ICONS = {
+    "Tablet":"📱","XRF":"🔬","NIRS":"📡","Molino":"⚙️","Compresor":"💨",
+    "Balanza analítica":"⚖️","Estación Climática":"🌡️","Balanza - Romana":"🏋️",
+    "Determinador de Humedad":"💧","Termómetro higrómetro":"🌡️"
+  };
 
   let tablets = [];
   let scanner = null;
+  let tabletActual = null;
 
   const $ = id => document.getElementById(id);
-  const badgeClass = e => "badge b-" + e.replace(/\s/g,"");
+  const fmt = d => d ? d.split("-").reverse().join("/") : "";
+  const bc = e => ({"Bueno":"b-Bueno","Regular":"b-Regular","Dañado":"b-Dañado","En reparación":"b-EnReparacion","Baja":"b-Baja"})[e]||"b-Baja";
+  const tipoIcon = t => TIPO_ICONS[t] || "📦";
 
   async function cargarTablets() {
     try {
       const r = await fetch(BASE + "/latest", { headers: { "X-Master-Key": API_KEY } });
       const d = await r.json();
-      tablets = d.record.tablets || [];
+      tablets = (d.record.tablets || []).map(t => ({...t, tipo: t.tipo || "Tablet"}));
     } catch(e) { tablets = []; }
+  }
+
+  async function guardarNube() {
+    await fetch(BASE, {method:"PUT", headers:HEADERS, body:JSON.stringify({tablets})});
   }
 
   function alerta(id, msg, tipo) {
@@ -117,52 +169,157 @@
   }
 
   function mostrarModal(t) {
+    tabletActual = t;
+    const esTablet = (t.tipo||"Tablet") === "Tablet";
+    const icon = tipoIcon(t.tipo||"Tablet");
+    $("mIcon").textContent = icon;
+    $("mTipo").textContent = t.tipo || "Tablet";
     $("mNombre").textContent = t.marca + " " + t.modelo;
     $("mSerie").textContent  = "Serie: " + t.serie;
-    const rows = [
-      ["👤 Asignado a", t.asignado],
-      ["🏢 Área",       t.area || "—"],
-      ["📍 Ubicación",  t.ubicacion || "—"],
-      ["🔧 Estado",     `<span class="${badgeClass(t.estado)}">${t.estado}</span>`],
-      ["📝 Obs.",       t.obs || "—"],
-    ];
-    $("mInfo").innerHTML = rows.map(([l,v]) =>
-      `<div class="info-row"><span class="info-label">${l}</span><span class="info-val">${v}</span></div>`
-    ).join("");
+    $("nuevoEstado").value = t.estado;
+    $("nuevaObs").value = t.obs || "";
+    $("estadoEditor").style.display = "none";
+    $("saveAlert").innerHTML = "";
+
+    let html = "";
+
+    // Datos básicos
+    html += `<div class="section-title">📋 Datos del Equipo</div>`;
+    html += row("🔧 Estado", `<span class="badge ${bc(t.estado)}">${t.estado}</span>`);
+    html += row("👤 Asignado a", t.asignado);
+    html += row("🏢 Área", t.area || "—");
+    html += row("📍 Ubicación", t.ubicacion || "—");
+    if (!esTablet && t.labUbicacion) html += row("🏢 Lab/Fijo", t.labUbicacion);
+
+    // Tablet-specific
+    if (esTablet) {
+      if (t.bateria !== "" && t.bateria !== undefined)
+        html += row("🔋 Batería", t.bateria + "%");
+      if (t.correo) html += row("📧 Correo", t.correo);
+      if (t.pin)    html += row("🔢 PIN", t.pin);
+
+      // Accesorios
+      if (t.acc) {
+        html += `<div class="section-title">🎒 Accesorios</div>`;
+        html += `<div class="chips-row">
+          <span class="chip ${t.acc.cargador==='Si'?'ok':'no'}">🔌 Cargador: ${t.acc.cargador||"—"}</span>
+          <span class="chip ${t.acc.lapiz==='Si'?'ok':'no'}">✏️ Lápiz: ${t.acc.lapiz||"—"}</span>
+          <span class="chip ${t.acc.funda==='Si'?'ok':'no'}">📦 Funda: ${t.acc.funda||"—"}</span>
+        </div>`;
+      }
+
+      // Apps
+      const appsInst = APPS.filter(a=>t.apps&&t.apps[a.id]==="Si");
+      if (appsInst.length) {
+        html += `<div class="section-title">📲 Aplicaciones</div>`;
+        html += `<div class="tags-row">${appsInst.map(a=>`<span class="tag tag-app">📲 ${a.label}</span>`).join("")}</div>`;
+      }
+
+      // Variables y Estudios
+      if ((t.vars||[]).length) {
+        html += `<div class="section-title">🔬 Variables</div>`;
+        html += `<div class="tags-row">${(t.vars||[]).map(v=>`<span class="tag tag-var">🔬 ${v}</span>`).join("")}</div>`;
+      }
+      if ((t.studies||[]).length) {
+        html += `<div class="section-title">📂 Estudios</div>`;
+        html += `<div class="tags-row">${(t.studies||[]).map(s=>`<span class="tag tag-est">📂 ${s}</span>`).join("")}</div>`;
+      }
+    }
+
+    // Equipment-specific
+    if (!esTablet) {
+      html += `<div class="section-title">🔧 Detalles del Equipo</div>`;
+      if (t.fcalib)       html += row("📅 Calibración", fmt(t.fcalib));
+      if (t.fproxcalib)   html += row("🔜 Próx. Calibración", fmt(t.fproxcalib));
+      if (t.accesoriosEquipo) html += row("⚙️ Accesorios", t.accesoriosEquipo);
+    }
+
+    // Fechas comunes
+    const hasFechas = t.fcompra||t.fgarantia||t.freasig||t.fdano||t.frep;
+    if (hasFechas) {
+      html += `<div class="section-title">📅 Fechas</div>`;
+      if (t.fcompra)   html += row("🛒 Compra", fmt(t.fcompra));
+      if (t.fgarantia) html += row("🛡️ Garantía", fmt(t.fgarantia));
+      if (t.freasig)   html += row("🔄 Reasignación", fmt(t.freasig));
+      if (t.fdano)     html += row("⚠️ Daño", fmt(t.fdano));
+      if (t.frep)      html += row("🔧 Reparación", fmt(t.frep));
+    }
+
+    if (t.obs) {
+      html += `<div class="section-title">📝 Observaciones</div>`;
+      html += `<p style="font-size:.82rem;color:#475569;">${t.obs}</p>`;
+    }
+
+    $("mInfo").innerHTML = html;
     $("overlayResult").classList.add("active");
+  }
+
+  function row(label, val) {
+    return `<div class="info-row"><span class="info-label">${label}</span><span class="info-val">${val}</span></div>`;
+  }
+
+  function mostrarEditor() {
+    $("estadoEditor").style.display = "block";
+    $("estadoEditor").scrollIntoView({ behavior: "smooth" });
+  }
+
+  async function guardarCambio() {
+    if (!tabletActual) return;
+    await cargarTablets();
+    const nuevoEstado = $("nuevoEstado").value;
+    const nuevaObs    = $("nuevaObs").value.trim();
+    const hoy = new Date().toLocaleString("es-ES",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"});
+    tablets = tablets.map(t => {
+      if (t.id === tabletActual.id) {
+        const bit = [...(t.bitacora||[])];
+        if (t.estado !== nuevoEstado) bit.push({fecha:hoy,evento:`🔁 Estado: "${t.estado}" → "${nuevoEstado}" (desde escáner).`});
+        return { ...t, estado: nuevoEstado, obs: nuevaObs, bitacora: bit };
+      }
+      return t;
+    });
+    await guardarNube();
+    tabletActual = { ...tabletActual, estado: nuevoEstado, obs: nuevaObs };
+    mostrarModal(tabletActual);
+    alerta("saveAlert", "✅ Estado actualizado correctamente.", "ok");
+    $("estadoEditor").style.display = "none";
   }
 
   function cerrarModal() {
     $("overlayResult").classList.remove("active");
+    tabletActual = null;
+    setTimeout(iniciarScanner, 300);
   }
 
-  async function buscar(serie) {
+  async function buscar(texto) {
     await cargarTablets();
-    const q = serie.trim().toLowerCase();
+    // Intentar extraer serie de URL (compatibilidad QRs viejos de tablets)
+    try {
+      const url = new URL(texto);
+      const s = url.searchParams.get("serie");
+      if (s) texto = s;
+    } catch(e) {}
+    const q = texto.trim().toLowerCase();
     return tablets.find(t =>
       (t.serie||"").toLowerCase() === q ||
-      (t.serie||"").toLowerCase().includes(q)
+      (t.serie||"").toLowerCase().includes(q) ||
+      (t.marca+" "+t.modelo).toLowerCase().includes(q) ||
+      (t.asignado||"").toLowerCase().includes(q)
     );
   }
 
   async function onScanSuccess(txt) {
     stopScanner();
-    // Si el QR contiene una URL, extraer el parámetro serie
-    try {
-      const url = new URL(txt);
-      const s = url.searchParams.get("serie");
-      if (s) txt = s;
-    } catch(e) {}
     const found = await buscar(txt);
     if (found) {
       mostrarModal(found);
     } else {
-      alerta("scanAlert", `⚠️ No se encontró tablet con código: <b>${txt}</b>`, "warn");
-      setTimeout(iniciarScanner, 2000);
+      alerta("scanAlert", `⚠️ No se encontró equipo con código: <b>${txt}</b>`, "warn");
+      setTimeout(iniciarScanner, 2500);
     }
   }
 
   function iniciarScanner() {
+    if (scanner) return;
     scanner = new Html5Qrcode("reader");
     scanner.start(
       { facingMode: "environment" },
@@ -197,14 +354,25 @@
     if (found) {
       mostrarModal(found);
     } else {
-      alerta("scanAlert", `⚠️ No se encontró tablet: <b>${val}</b>`, "warn");
+      alerta("scanAlert", `⚠️ No se encontró equipo: <b>${val}</b>`, "warn");
     }
   }
 
   $("manualSerie").addEventListener("keydown", e => { if(e.key==="Enter") buscarManual(); });
-  $("overlayResult").addEventListener("click", e => { if(e.target===$("overlayResult")) { cerrarModal(); setTimeout(iniciarScanner,300); } });
+  $("overlayResult").addEventListener("click", e => {
+    if(e.target===$("overlayResult")) { cerrarModal(); }
+  });
 
-  iniciarScanner();
+  // Auto-búsqueda si hay ?serie= en la URL (QRs de tablets existentes)
+  (async () => {
+    const params = new URLSearchParams(window.location.search);
+    const serieParam = params.get("serie");
+    if (serieParam) {
+      const found = await buscar(serieParam);
+      if (found) { mostrarModal(found); return; }
+    }
+    iniciarScanner();
+  })();
 </script>
 </body>
 </html>

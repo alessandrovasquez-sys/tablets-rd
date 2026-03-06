@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Inventario de Tablets</title>
+<title>Inventario de Equipos</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',sans-serif;background:#f1f5f9;min-height:100vh}
@@ -15,7 +15,15 @@ header p{font-size:.78rem;color:#c7d2fe;margin-top:2px}
 .hbtn:hover{background:#e0e7ff}
 .hbtn.sec{background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.4)}
 .hbtn.sec:hover{background:rgba(255,255,255,.25)}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:980px;margin:20px auto 0;padding:0 16px}
+
+/* TABS */
+.tabs-wrap{max-width:980px;margin:16px auto 0;padding:0 16px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{padding:7px 16px;border-radius:20px;border:1px solid #e2e8f0;background:white;font-size:.8rem;font-weight:600;color:#64748b;cursor:pointer;transition:all .15s}
+.tab:hover{background:#e0e7ff;color:#4338ca;border-color:#c7d2fe}
+.tab.active{background:#4338ca;color:white;border-color:#4338ca}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:980px;margin:14px auto 0;padding:0 16px}
 .stat-card{background:white;border-radius:12px;padding:14px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.08)}
 .stat-card .num{font-size:1.8rem;font-weight:800;color:#1e293b}
 .filters{max-width:980px;margin:14px auto 0;padding:0 16px;display:flex;gap:10px;flex-wrap:wrap}
@@ -35,6 +43,7 @@ header p{font-size:.78rem;color:#c7d2fe;margin-top:2px}
 .tag-var{background:#ede9fe;color:#5b21b6}
 .tag-est{background:#e0f2fe;color:#075985}
 .tag-app{background:#fef3c7;color:#92400e}
+.tag-tipo{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
 .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
 .chip{font-size:.7rem;padding:2px 8px;border-radius:999px;border:1px solid #e2e8f0;color:#475569;background:#f8fafc}
 .chip.ok{border-color:#bbf7d0;color:#166534;background:#f0fdf4}
@@ -68,9 +77,11 @@ header p{font-size:.78rem;color:#c7d2fe;margin-top:2px}
 .bat-fill{height:100%;border-radius:999px}
 .empty{text-align:center;padding:60px 20px;color:#94a3b8}
 .empty .icon{font-size:3.5rem;margin-bottom:12px}
+
+/* MODAL */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:flex-start;justify-content:center;overflow-y:auto;padding:16px}
 .overlay.active{display:flex}
-.modal{background:white;border-radius:18px;padding:26px;width:100%;max-width:620px;box-shadow:0 8px 32px rgba(0,0,0,.18);margin:auto}
+.modal{background:white;border-radius:18px;padding:26px;width:100%;max-width:660px;box-shadow:0 8px 32px rgba(0,0,0,.18);margin:auto}
 .modal h2{font-size:1.05rem;font-weight:700;color:#1e293b;margin-bottom:4px}
 .sec{font-size:.7rem;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:.06em;margin:16px 0 9px;border-top:1px solid #e2e8f0;padding-top:13px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
@@ -94,6 +105,18 @@ textarea{resize:none;height:56px}
 .cb-item input[type=checkbox]{width:15px;height:15px;accent-color:#6366f1;cursor:pointer;flex-shrink:0}
 .cb-item span{font-size:.8rem;color:#334155}
 .cb-item.checked{background:#ede9fe;border-color:#c4b5fd}
+
+/* TIPO SELECTOR en modal */
+.tipo-selector{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px}
+.tipo-btn{padding:8px 6px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc;font-size:.76rem;font-weight:600;color:#475569;cursor:pointer;text-align:center;transition:all .15s}
+.tipo-btn:hover{background:#e0e7ff;border-color:#c7d2fe;color:#4338ca}
+.tipo-btn.sel{background:#4338ca;color:white;border-color:#4338ca}
+
+/* SECCION CONDICIONAL */
+.seccion-tablet{display:block}
+.seccion-equipo{display:none}
+
+/* QR MODAL */
 .qr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:center;justify-content:center}
 .qr-overlay.active{display:flex}
 .qr-box{background:white;border-radius:18px;padding:26px;max-width:460px;width:96%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.2)}
@@ -106,6 +129,8 @@ textarea{resize:none;height:56px}
 .btn-print{padding:8px 16px;border-radius:8px;background:#4338ca;color:white;border:none;font-size:.84rem;font-weight:600;cursor:pointer}
 .btn-print:hover{background:#3730a3}
 .btn-cqr{padding:8px 16px;border-radius:8px;border:1px solid #e2e8f0;color:#64748b;background:white;font-size:.84rem;cursor:pointer}
+
+/* ESTUDIOS PANEL */
 .sp-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:150;align-items:center;justify-content:center}
 .sp-overlay.active{display:flex}
 .sp-box{background:white;border-radius:18px;padding:26px;max-width:500px;width:94%;box-shadow:0 8px 32px rgba(0,0,0,.18);max-height:90vh;display:flex;flex-direction:column}
@@ -122,25 +147,33 @@ textarea{resize:none;height:56px}
 .sp-item button:hover{background:#fee2e2}
 .sp-empty{text-align:center;padding:30px;color:#94a3b8;font-size:.84rem}
 .sp-footer{display:flex;justify-content:flex-end;margin-top:14px}
+
 #syncBadge{position:fixed;bottom:20px;right:20px;background:#1e293b;color:white;padding:10px 16px;border-radius:10px;font-size:.78rem;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,.2);transition:opacity .5s;display:none}
 @media print{body>*{display:none!important}.pzone{display:flex!important;flex-direction:column;align-items:center;justify-content:center;position:fixed;inset:0;background:white;padding:30px}.pzone *{visibility:visible}}
-@media(max-width:560px){.stats{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}.card-main{flex-direction:column}.card-actions{width:100%}.acc-row{flex-wrap:wrap}.cb-grid{grid-template-columns:1fr}}
+@media(max-width:560px){.stats{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}.card-main{flex-direction:column}.card-actions{width:100%}.acc-row{flex-wrap:wrap}.cb-grid{grid-template-columns:1fr}.tipo-selector{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
 <header>
-  <div><h1>📱 Inventario de Tablets</h1><p id="headerSub">Personal en Campo</p></div>
+  <div><h1>📦 Inventario de Equipos</h1><p id="headerSub">Personal en Campo</p></div>
   <div class="hbtns">
     <button class="hbtn sec" onclick="openStudiesPanel()">📂 Estudios</button>
     <button class="hbtn" id="btnAgregar">+ Agregar</button>
   </div>
 </header>
+
+<!-- TABS POR TIPO -->
+<div class="tabs-wrap">
+  <div class="tabs" id="tabsContainer"></div>
+</div>
+
 <div class="stats">
   <div class="stat-card"><div class="num" id="sBueno">0</div><span class="badge b-Bueno">Bueno</span></div>
   <div class="stat-card"><div class="num" id="sRegular">0</div><span class="badge b-Regular">Regular</span></div>
   <div class="stat-card"><div class="num" id="sDanado">0</div><span class="badge b-Danado">Dañado</span></div>
   <div class="stat-card"><div class="num" id="sRep">0</div><span class="badge b-EnRep">En reparación</span></div>
 </div>
+
 <div class="filters">
   <input id="search" type="text" placeholder="🔍 Buscar por nombre, serie, área..."/>
   <select id="filtroEstado">
@@ -152,48 +185,92 @@ textarea{resize:none;height:56px}
 <div class="export-btn"><button onclick="exportCSV()">⬇ Exportar CSV</button></div>
 <div class="list" id="lista"><div class="empty"><div class="icon">⏳</div><p>Cargando datos...</p></div></div>
 
-<!-- MODAL TABLET -->
+<!-- MODAL EQUIPO -->
 <div class="overlay" id="overlay">
  <div class="modal">
-  <h2 id="modalTitle">Nueva Tablet</h2>
+  <h2 id="modalTitle">Nuevo Equipo</h2>
+
+  <!-- SELECTOR DE TIPO -->
+  <div class="sec" style="border-top:none;margin-top:4px">🏷️ Tipo de Equipo</div>
+  <div class="tipo-selector" id="tipoSelector">
+    <div class="tipo-btn sel" data-tipo="Tablet" onclick="setTipo('Tablet')">📱 Tablet</div>
+    <div class="tipo-btn" data-tipo="XRF" onclick="setTipo('XRF')">🔬 XRF</div>
+    <div class="tipo-btn" data-tipo="NIRS" onclick="setTipo('NIRS')">📡 NIRS</div>
+    <div class="tipo-btn" data-tipo="Molino" onclick="setTipo('Molino')">⚙️ Molino</div>
+    <div class="tipo-btn" data-tipo="Compresor" onclick="setTipo('Compresor')">💨 Compresor</div>
+    <div class="tipo-btn" data-tipo="Balanza analítica" onclick="setTipo('Balanza analítica')">⚖️ Balanza analítica</div>
+    <div class="tipo-btn" data-tipo="Estación Climática" onclick="setTipo('Estación Climática')">🌡️ Est. Climática</div>
+    <div class="tipo-btn" data-tipo="Balanza - Romana" onclick="setTipo('Balanza - Romana')">🏋️ Romana</div>
+    <div class="tipo-btn" data-tipo="Determinador de Humedad" onclick="setTipo('Determinador de Humedad')">💧 Det. Humedad</div>
+    <div class="tipo-btn" data-tipo="Termómetro higrómetro" onclick="setTipo('Termómetro higrómetro')">🌡️ Termómetro</div>
+    <div class="tipo-btn" data-tipo="Otro" onclick="setTipo('Otro')">📦 Otro</div>
+  </div>
+  <!-- Campo tipo personalizado -->
+  <div class="field full" id="tipoOtroField" style="display:none;margin-top:8px">
+    <label>Especifica el tipo de equipo</label>
+    <input id="fTipoOtro" type="text" placeholder="ej. Microscopio"/>
+  </div>
+
+  <!-- DATOS BÁSICOS (todos los equipos) -->
   <div class="sec">📋 Datos del Equipo</div>
   <div class="grid2">
-    <div class="field"><label>Marca *</label><input id="fMarca" type="text" placeholder="ej. Samsung"/></div>
+    <div class="field"><label>Marca *</label><input id="fMarca" type="text" placeholder="ej. Samsung / Bruker"/></div>
     <div class="field"><label>Modelo</label><input id="fModelo" type="text" placeholder="ej. Galaxy Tab A8"/></div>
     <div class="field"><label>Número de Serie *</label><input id="fSerie" type="text" placeholder="ej. R52N804XXXX"/></div>
     <div class="field"><label>Estado</label>
       <select id="fEstado"><option>Bueno</option><option>Regular</option><option>Dañado</option><option>En reparación</option><option>Baja</option></select>
     </div>
-    <div class="field full"><label>🔋 Batería (%)</label><input id="fBateria" type="number" min="0" max="100" placeholder="ej. 85"/></div>
   </div>
-  <div class="sec">🎒 Accesorios</div>
-  <div style="display:flex;flex-direction:column;gap:7px">
-    <div class="acc-row"><label>🔌 Cargador</label><select id="aCargEst"><option value="Si">✅ Sí</option><option value="No">❌ No</option></select><input id="aCargDesc" type="text" placeholder="Serie/modelo"/></div>
-    <div class="acc-row"><label>✏️ Lápiz/Stylus</label><select id="aLapEst"><option value="Si">✅ Sí</option><option value="No">❌ No</option></select><input id="aLapDesc" type="text" placeholder="Serie/modelo"/></div>
-    <div class="acc-row"><label>📦 Funda</label><select id="aFundEst"><option value="Si">✅ Sí</option><option value="No">❌ No</option></select><input id="aFundDesc" type="text" placeholder="Color/descripción"/></div>
+
+  <!-- SECCIÓN SOLO TABLETS -->
+  <div id="secTablet">
+    <div class="sec">🔋 Tablet – Batería y Accesorios</div>
+    <div class="grid2">
+      <div class="field full"><label>🔋 Batería (%)</label><input id="fBateria" type="number" min="0" max="100" placeholder="ej. 85"/></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:7px;margin-top:6px">
+      <div class="acc-row"><label>🔌 Cargador</label><select id="aCargEst"><option value="Si">✅ Sí</option><option value="No">❌ No</option></select><input id="aCargDesc" type="text" placeholder="Serie/modelo"/></div>
+      <div class="acc-row"><label>✏️ Lápiz/Stylus</label><select id="aLapEst"><option value="Si">✅ Sí</option><option value="No">❌ No</option></select><input id="aLapDesc" type="text" placeholder="Serie/modelo"/></div>
+      <div class="acc-row"><label>📦 Funda</label><select id="aFundEst"><option value="Si">✅ Sí</option><option value="No">❌ No</option></select><input id="aFundDesc" type="text" placeholder="Color/descripción"/></div>
+    </div>
+    <div class="sec">📲 Aplicaciones Instaladas</div>
+    <div style="display:flex;flex-direction:column;gap:7px">
+      <div class="acc-row"><label>📦 Dropbox</label><select id="appDropbox"><option value="Si">✅ Instalada</option><option value="No">❌ No instalada</option></select></div>
+      <div class="acc-row"><label>📋 KoBoToolbox</label><select id="appKobo"><option value="Si">✅ Instalada</option><option value="No">❌ No instalada</option></select></div>
+      <div class="acc-row"><label>📗 Fieldbook</label><select id="appField"><option value="Si">✅ Instalada</option><option value="No">❌ No instalada</option></select></div>
+    </div>
+    <div class="sec">🔬 Variables de Trabajo</div>
+    <div class="cb-grid" id="varsGrid"></div>
+    <div class="sec">📂 Estudios Asignados</div>
+    <div class="cb-grid" id="studiesGrid"></div>
+    <div class="sec">🔐 Acceso y Seguridad</div>
+    <div class="grid2">
+      <div class="field full"><label>📧 Correo de la cuenta</label><input id="fCorreo" type="text" placeholder="ej. usuario@gmail.com"/></div>
+      <div class="field"><label>🔑 Contraseña de la cuenta</label><input id="fPassword" type="text" placeholder="Contraseña"/></div>
+      <div class="field"><label>🔢 PIN de la tablet</label><input id="fPin" type="text" placeholder="ej. 1234"/></div>
+    </div>
   </div>
-  <div class="sec">📲 Aplicaciones Instaladas</div>
-  <div style="display:flex;flex-direction:column;gap:7px">
-    <div class="acc-row"><label>📦 Dropbox</label><select id="appDropbox"><option value="Si">✅ Instalada</option><option value="No">❌ No instalada</option></select></div>
-    <div class="acc-row"><label>📋 KoBoToolbox</label><select id="appKobo"><option value="Si">✅ Instalada</option><option value="No">❌ No instalada</option></select></div>
-    <div class="acc-row"><label>📗 Fieldbook</label><select id="appField"><option value="Si">✅ Instalada</option><option value="No">❌ No instalada</option></select></div>
+
+  <!-- SECCIÓN OTROS EQUIPOS -->
+  <div id="secEquipo" style="display:none">
+    <div class="sec">🔧 Detalles del Equipo</div>
+    <div class="grid2">
+      <div class="field"><label>📅 Fecha de Calibración</label><input id="fCalib" type="date"/></div>
+      <div class="field"><label>📅 Próxima Calibración</label><input id="fProxCalib" type="date"/></div>
+      <div class="field full"><label>📍 Ubicación Fija / Laboratorio</label><input id="fLabUbic" type="text" placeholder="ej. Laboratorio Central – Sala 2"/></div>
+      <div class="field full"><label>⚙️ Accesorios / Componentes</label><input id="fAccesoriosEquipo" type="text" placeholder="ej. Cable USB, adaptador, manual"/></div>
+    </div>
   </div>
-  <div class="sec">🔬 Variables de Trabajo</div>
-  <div class="cb-grid" id="varsGrid"></div>
-  <div class="sec">📂 Estudios Asignados</div>
-  <div class="cb-grid" id="studiesGrid"></div>
-  <div class="sec">🔐 Acceso y Seguridad</div>
-  <div class="grid2">
-    <div class="field full"><label>📧 Correo de la cuenta</label><input id="fCorreo" type="text" placeholder="ej. usuario@gmail.com"/></div>
-    <div class="field"><label>🔑 Contraseña de la cuenta</label><input id="fPassword" type="text" placeholder="Contraseña"/></div>
-    <div class="field"><label>🔢 PIN de la tablet</label><input id="fPin" type="text" placeholder="ej. 1234"/></div>
-  </div>
+
+  <!-- ASIGNACIÓN (todos) -->
   <div class="sec">👤 Asignación</div>
   <div class="grid2">
     <div class="field"><label>Asignado a *</label><input id="fAsignado" type="text" placeholder="Nombre completo"/></div>
     <div class="field"><label>Área / Departamento</label><input id="fArea" type="text" placeholder="ej. Operaciones"/></div>
     <div class="field full"><label>Ubicación en Campo</label><input id="fUbicacion" type="text" placeholder="ej. Zona Norte - Sitio 3"/></div>
   </div>
+
+  <!-- FECHAS -->
   <div class="sec">📅 Fechas</div>
   <div class="grid2">
     <div class="field"><label>Fecha de Compra</label><input id="fFcompra" type="date"/></div>
@@ -202,11 +279,12 @@ textarea{resize:none;height:56px}
     <div class="field"><label>Fecha de Daño</label><input id="fFdano" type="date"/></div>
     <div class="field"><label>Entrega tras Reparación</label><input id="fFrep" type="date"/></div>
   </div>
+
   <div class="sec">📝 Observaciones</div>
   <div class="field"><textarea id="fObs" placeholder="Notas adicionales..."></textarea></div>
   <div class="modal-actions">
     <button class="btn-cancel" id="btnCancel">Cancelar</button>
-    <button class="btn-save" id="btnSave">Registrar tablet</button>
+    <button class="btn-save" id="btnSave">Registrar equipo</button>
   </div>
  </div>
 </div>
@@ -254,7 +332,14 @@ const KEY_S = "estudios_v1";
 const VARS  = ["Screening","Finca","Registro","Parent Testing","Viveros","Viveros Backross"];
 const APPS  = [{id:"appDropbox",label:"Dropbox"},{id:"appKobo",label:"KoBoToolbox"},{id:"appField",label:"Fieldbook"}];
 
-let tablets = [], editId = null, openLogs = {};
+const TIPOS = ["Tablet","XRF","NIRS","Molino","Compresor","Balanza analítica","Estación Climática","Balanza - Romana","Determinador de Humedad","Termómetro higrómetro","Otro"];
+const TIPOS_EQUIPO_ICON = {
+  "Tablet":"📱","XRF":"🔬","NIRS":"📡","Molino":"⚙️","Compresor":"💨",
+  "Balanza analítica":"⚖️","Estación Climática":"🌡️","Balanza - Romana":"🏋️",
+  "Determinador de Humedad":"💧","Termómetro higrómetro":"🌡️","Otro":"📦"
+};
+
+let tablets = [], editId = null, openLogs = {}, currentTipo = "Tablet", activeTab = "Todos";
 let studies = JSON.parse(localStorage.getItem(KEY_S) || JSON.stringify([
   "2025B","2025C / 01 BCROAF","2025C / 02 INC_LINES01","2025C / 03 PROMISORIES1",
   "2025C / 05 BCRAFCIM","2025C / 06 SLF","2025C / 07 MUTANTES",
@@ -269,13 +354,18 @@ const today = () => new Date().toLocaleString("es-ES",{day:"2-digit",month:"2-di
 const fmt = d => d ? d.split("-").reverse().join("/") : "";
 const bc = e => ({"Bueno":"b-Bueno","Regular":"b-Regular","Dañado":"b-Danado","En reparación":"b-EnRep","Baja":"b-Baja"})[e]||"b-Baja";
 const batColor = v => v>=60?"#22c55e":v>=30?"#f59e0b":"#ef4444";
+const tipoIcon = t => TIPOS_EQUIPO_ICON[t] || "📦";
 
+// ─── NUBE ─────────────────────────────────────────────────
 async function cargarNube() {
   try {
     const r = await fetch(BASE+"/latest",{headers:{"X-Master-Key":API_KEY}});
     const d = await r.json();
     tablets = d.record.tablets || [];
+    // Retrocompatibilidad: tablets antiguas sin campo "tipo" → asignarles "Tablet"
+    tablets = tablets.map(t => ({...t, tipo: t.tipo || "Tablet"}));
   } catch(e) { tablets=[]; showSync("⚠️ Sin conexión","#dc2626"); }
+  buildTabs();
   render();
 }
 
@@ -295,40 +385,65 @@ function showSync(msg,bg){
   setTimeout(()=>{b.style.opacity="0";setTimeout(()=>b.style.display="none",500);},3000);
 }
 
+// ─── TABS ──────────────────────────────────────────────────
+function buildTabs(){
+  const tiposPresentes = ["Todos", ...new Set(tablets.map(t=>t.tipo||"Tablet"))];
+  const container = $("tabsContainer");
+  container.innerHTML = tiposPresentes.map(t=>{
+    const count = t==="Todos" ? tablets.length : tablets.filter(x=>x.tipo===t).length;
+    return `<button class="tab${activeTab===t?" active":""}" onclick="setTab('${t}')">${tipoIcon(t)!=="📦"||t==="Otros"?tipoIcon(t):""} ${t} <span style="opacity:.7;font-size:.72rem">(${count})</span></button>`;
+  }).join("");
+}
+
+function setTab(t){
+  activeTab = t;
+  buildTabs();
+  render();
+}
+
+// ─── RENDER ────────────────────────────────────────────────
 function render(){
   const q=$("search").value.toLowerCase(), est=$("filtroEstado").value;
-  const fil=tablets.filter(t=>{
-    const mq=!q||["marca","modelo","serie","asignado","area","ubicacion"].some(f=>(t[f]||"").toLowerCase().includes(q));
+  const base = activeTab==="Todos" ? tablets : tablets.filter(t=>t.tipo===activeTab);
+  const fil=base.filter(t=>{
+    const mq=!q||["marca","modelo","serie","asignado","area","ubicacion","tipo"].some(f=>(t[f]||"").toLowerCase().includes(q));
     return mq&&(!est||t.estado===est);
   });
   $("headerSub").textContent=`Personal en Campo · ${tablets.length} equipo${tablets.length!==1?"s":""}`;
-  $("sBueno").textContent  =tablets.filter(t=>t.estado==="Bueno").length;
-  $("sRegular").textContent=tablets.filter(t=>t.estado==="Regular").length;
-  $("sDanado").textContent =tablets.filter(t=>t.estado==="Dañado").length;
-  $("sRep").textContent    =tablets.filter(t=>t.estado==="En reparación").length;
+  $("sBueno").textContent  =base.filter(t=>t.estado==="Bueno").length;
+  $("sRegular").textContent=base.filter(t=>t.estado==="Regular").length;
+  $("sDanado").textContent =base.filter(t=>t.estado==="Dañado").length;
+  $("sRep").textContent    =base.filter(t=>t.estado==="En reparación").length;
+
   const lista=$("lista");
-  if(!fil.length){lista.innerHTML=`<div class="empty"><div class="icon">📋</div><p>${!tablets.length?"No hay tablets registradas aún.":"Sin resultados."}</p></div>`;return;}
+  if(!fil.length){lista.innerHTML=`<div class="empty"><div class="icon">📋</div><p>${!tablets.length?"No hay equipos registrados aún.":"Sin resultados."}</p></div>`;return;}
   lista.innerHTML=fil.map(t=>{
+    const esTablet = (t.tipo||"Tablet")==="Tablet";
+    const icon = tipoIcon(t.tipo||"Tablet");
     const vars=(t.vars||[]).map(v=>`<span class="tag tag-var">🔬 ${v}</span>`).join("");
     const ests=(t.studies||[]).map(s=>`<span class="tag tag-est">📂 ${s}</span>`).join("");
-    const appTags=APPS.filter(a=>t.apps&&t.apps[a.id]==="Si").map(a=>`<span class="tag tag-app">📲 ${a.label}</span>`).join("");
-    const acc=[
+    const appTags=esTablet?APPS.filter(a=>t.apps&&t.apps[a.id]==="Si").map(a=>`<span class="tag tag-app">📲 ${a.label}</span>`).join(""):"";
+    const tipoTag=`<span class="tag tag-tipo">${icon} ${t.tipo||"Tablet"}</span>`;
+    const acc=esTablet?[
       `<span class="chip ${t.acc?.cargador==="Si"?"ok":"no"}">🔌 Cargador: ${t.acc?.cargador||"—"}</span>`,
       `<span class="chip ${t.acc?.lapiz==="Si"?"ok":"no"}">✏️ Lápiz: ${t.acc?.lapiz||"—"}</span>`,
       `<span class="chip ${t.acc?.funda==="Si"?"ok":"no"}">📦 Funda: ${t.acc?.funda||"—"}</span>`,
-    ].join("");
+    ].join("") : (t.accesoriosEquipo?`<span class="chip">⚙️ ${t.accesoriosEquipo}</span>`:"");
+    const calibTag=!esTablet&&t.fcalib?`<span>🔧 Calib: ${fmt(t.fcalib)}</span>`:"";
+    const proxCalibTag=!esTablet&&t.fproxcalib?`<span>🔜 Próx: ${fmt(t.fproxcalib)}</span>`:"";
     const fechas=[t.fcompra&&`🛒 ${fmt(t.fcompra)}`,t.fgarantia&&`🛡️ ${fmt(t.fgarantia)}`,t.freasig&&`🔄 ${fmt(t.freasig)}`,t.fdano&&`⚠️ ${fmt(t.fdano)}`,t.frep&&`🔧 ${fmt(t.frep)}`].filter(Boolean).map(f=>`<span>${f}</span>`).join("");
-    const bat=t.bateria!==""&&t.bateria!==undefined?`<div class="bat-bar">🔋<div class="bat-track"><div class="bat-fill" style="width:${t.bateria}%;background:${batColor(+t.bateria)}"></div></div>${t.bateria}%</div>`:"";
+    const bat=esTablet&&t.bateria!==""&&t.bateria!==undefined?`<div class="bat-bar">🔋<div class="bat-track"><div class="bat-fill" style="width:${t.bateria}%;background:${batColor(+t.bateria)}"></div></div>${t.bateria}%</div>`:"";
     const logs=(t.bitacora||[]).slice().reverse().map(l=>`<div class="log-item"><span class="log-date">${l.fecha}</span><span>${l.evento}</span></div>`).join("")||`<p class="log-empty">Sin eventos aún.</p>`;
+    const labUbic=!esTablet&&t.labUbicacion?`📍 ${t.labUbicacion}<br>`:"";
     return`<div class="card">
       <div class="card-main">
         <div class="card-info" style="flex:1;min-width:0">
           <div class="title">${t.marca} ${t.modelo}<span class="badge ${bc(t.estado)}">${t.estado}</span></div>
-          <div class="meta">🔢 Serie: <b>${t.serie}</b><br>👤 ${t.asignado}${t.area?" · "+t.area:""}<br>${t.ubicacion?"📍 "+t.ubicacion+"<br>":""}${t.correo?"📧 "+t.correo+"<br>":""}${t.pin?"🔢 PIN: "+t.pin+"<br>":""}${t.obs?"📝 "+t.obs:""}</div>
+          <div class="meta">🔢 Serie: <b>${t.serie}</b><br>👤 ${t.asignado}${t.area?" · "+t.area:""}<br>${t.ubicacion?"📍 "+t.ubicacion+"<br>":""}${labUbic}${esTablet&&t.correo?"📧 "+t.correo+"<br>":""}${esTablet&&t.pin?"🔢 PIN: "+t.pin+"<br>":""}${t.obs?"📝 "+t.obs:""}</div>
           ${bat}
-          ${vars||ests||appTags?`<div class="tag-row">${vars}${ests}${appTags}</div>`:""}
-          <div class="chips">${acc}</div>
-          ${fechas?`<div class="fechas">${fechas}</div>`:""}
+          <div class="tag-row">${tipoTag}${vars}${ests}${appTags}</div>
+          ${acc?`<div class="chips">${acc}</div>`:""}
+          ${fechas||calibTag||proxCalibTag?`<div class="fechas">${fechas}${calibTag}${proxCalibTag}</div>`:""}
         </div>
         <div class="card-actions">
           <button class="btn-qr" onclick="showQR('${t.id}')">🔳 QR</button>
@@ -344,23 +459,34 @@ function render(){
 
 function toggleLog(id){openLogs[id]=!openLogs[id];var el=document.getElementById("log-"+id);if(el)el.classList.toggle("open",!!openLogs[id]);}
 
+// ─── QR ────────────────────────────────────────────────────
 function showQR(id){
   var t=tablets.find(x=>x.id===id); if(!t) return;
-  var qrText=NETLIFY+"/scanner.html?serie="+encodeURIComponent(t.serie);
+  const esTablet=(t.tipo||"Tablet")==="Tablet";
+  // QR contiene número de serie (retrocompatible) o URL para tablets, serie para otros
+  var qrText = esTablet
+    ? NETLIFY+"/scanner.html?serie="+encodeURIComponent(t.serie)
+    : t.serie;
   var fichaLines=[
-    "📱 "+t.marca+" "+t.modelo,"🔢 Serie: "+t.serie,"📊 Estado: "+t.estado,
-    t.bateria!==""&&t.bateria!==undefined?"🔋 Batería: "+t.bateria+"%":"",
+    `${tipoIcon(t.tipo||"Tablet")} ${t.tipo||"Tablet"}: ${t.marca} ${t.modelo}`,
+    "🔢 Serie: "+t.serie,"📊 Estado: "+t.estado,
+    esTablet&&t.bateria!==""&&t.bateria!==undefined?"🔋 Batería: "+t.bateria+"%":"",
     "👤 Asignado: "+t.asignado+(t.area?" / "+t.area:""),
     t.ubicacion?"📍 "+t.ubicacion:"",
-    (t.vars||[]).length?"🔬 Variables: "+(t.vars||[]).join(", "):"",
-    (t.studies||[]).length?"📂 Estudios: "+(t.studies||[]).join(", "):"",
-    APPS.filter(a=>t.apps&&t.apps[a.id]==="Si").length?"📲 Apps: "+APPS.filter(a=>t.apps&&t.apps[a.id]==="Si").map(a=>a.label).join(", "):"",
-    "🔌 Cargador: "+(t.acc?.cargador||"—")+" | ✏️ Lápiz: "+(t.acc?.lapiz||"—")+" | 📦 Funda: "+(t.acc?.funda||"—"),
-    t.fcompra?"🛒 Compra: "+fmt(t.fcompra):"",t.fgarantia?"🛡️ Garantía: "+fmt(t.fgarantia):"",
+    !esTablet&&t.labUbicacion?"🏢 Lab: "+t.labUbicacion:"",
+    !esTablet&&t.fcalib?"🔧 Calibración: "+fmt(t.fcalib):"",
+    !esTablet&&t.fproxcalib?"🔜 Próx. Calib: "+fmt(t.fproxcalib):"",
+    esTablet&&(t.vars||[]).length?"🔬 Variables: "+(t.vars||[]).join(", "):"",
+    esTablet&&(t.studies||[]).length?"📂 Estudios: "+(t.studies||[]).join(", "):"",
+    esTablet&&APPS.filter(a=>t.apps&&t.apps[a.id]==="Si").length?"📲 Apps: "+APPS.filter(a=>t.apps&&t.apps[a.id]==="Si").map(a=>a.label).join(", "):"",
+    esTablet?"🔌 Cargador: "+(t.acc?.cargador||"—")+" | ✏️ Lápiz: "+(t.acc?.lapiz||"—")+" | 📦 Funda: "+(t.acc?.funda||"—"):"",
+    !esTablet&&t.accesoriosEquipo?"⚙️ Accesorios: "+t.accesoriosEquipo:"",
+    t.fcompra?"🛒 Compra: "+fmt(t.fcompra):"",
+    t.fgarantia?"🛡️ Garantía: "+fmt(t.fgarantia):"",
     t.obs?"📝 "+t.obs:"",
   ].filter(Boolean);
   $("qrTitle").textContent=t.marca+" "+t.modelo;
-  $("qrSub").textContent="Serie: "+t.serie+" · "+t.estado;
+  $("qrSub").textContent=(t.tipo||"Tablet")+" · Serie: "+t.serie+" · "+t.estado;
   $("qrFicha").innerHTML=fichaLines.map(l=>"• "+l).join("<br>");
   var wrap=$("qrWrap"); wrap.innerHTML="";
   var img=document.createElement("img");
@@ -383,6 +509,130 @@ $("btnPrint").onclick=function(){
   setTimeout(()=>{window.print();setTimeout(()=>{pz.style.display="none";pz.innerHTML="";},300);},100);
 };
 
+// ─── TIPO SELECTOR MODAL ───────────────────────────────────
+function setTipo(tipo){
+  currentTipo=tipo;
+  document.querySelectorAll(".tipo-btn").forEach(b=>b.classList.toggle("sel",b.dataset.tipo===tipo));
+  const esTablet=tipo==="Tablet";
+  $("secTablet").style.display=esTablet?"block":"none";
+  $("secEquipo").style.display=esTablet?"none":"block";
+  $("tipoOtroField").style.display=tipo==="Otro"?"block":"none";
+}
+
+// ─── MODAL ─────────────────────────────────────────────────
+function openModal(id){
+  editId=id||null; var t=id?tablets.find(x=>x.id===id):{};
+  const tipo=t.tipo||"Tablet";
+  currentTipo=tipo;
+  $("modalTitle").textContent=id?"Editar Equipo":"Nuevo Equipo";
+  $("btnSave").textContent=id?"Guardar cambios":"Registrar equipo";
+  // Set tipo buttons
+  document.querySelectorAll(".tipo-btn").forEach(b=>b.classList.toggle("sel",b.dataset.tipo===tipo));
+  setTipo(tipo);
+  $("fTipoOtro").value=tipo==="Otro"?(t.tipoCustom||""):"";
+  $("fMarca").value=t.marca||""; $("fModelo").value=t.modelo||"";
+  $("fSerie").value=t.serie||""; $("fAsignado").value=t.asignado||"";
+  $("fArea").value=t.area||"";   $("fUbicacion").value=t.ubicacion||"";
+  $("fObs").value=t.obs||"";     $("fEstado").value=t.estado||"Bueno";
+  // Tablet fields
+  $("fBateria").value=t.bateria!==undefined?t.bateria:"";
+  $("aCargEst").value=t.acc?.cargador||"Si"; $("aCargDesc").value=t.acc?.cargDesc||"";
+  $("aLapEst").value=t.acc?.lapiz||"Si";     $("aLapDesc").value=t.acc?.lapDesc||"";
+  $("aFundEst").value=t.acc?.funda||"Si";    $("aFundDesc").value=t.acc?.fundDesc||"";
+  APPS.forEach(a=>$(a.id).value=t.apps?.[a.id]||"No");
+  $("fCorreo").value=t.correo||""; $("fPassword").value=t.password||""; $("fPin").value=t.pin||"";
+  // Equipment fields
+  $("fCalib").value=t.fcalib||""; $("fProxCalib").value=t.fproxcalib||"";
+  $("fLabUbic").value=t.labUbicacion||"";
+  $("fAccesoriosEquipo").value=t.accesoriosEquipo||"";
+  // Dates
+  $("fFcompra").value=t.fcompra||""; $("fFgarantia").value=t.fgarantia||"";
+  $("fFreasig").value=t.freasig||""; $("fFdano").value=t.fdano||""; $("fFrep").value=t.frep||"";
+  buildCBGrid("varsGrid",VARS,t.vars||[]);
+  buildCBGrid("studiesGrid",studies,t.studies||[]);
+  $("overlay").classList.add("active"); $("fMarca").focus();
+}
+function closeModal(){$("overlay").classList.remove("active");editId=null;}
+function openEdit(id){openModal(id);}
+
+async function del(id){
+  if(!confirm("¿Eliminar este registro?"))return;
+  tablets=tablets.filter(t=>t.id!==id);
+  await guardarNube(); buildTabs(); render();
+}
+
+$("btnSave").onclick=async function(){
+  var marca=$("fMarca").value.trim(),serie=$("fSerie").value.trim(),asignado=$("fAsignado").value.trim();
+  if(!marca||!serie||!asignado){alert("Marca, serie y persona asignada son requeridos.");return;}
+  var nuevoEst=$("fEstado").value;
+  const tipoFinal = currentTipo==="Otro" ? ($("fTipoOtro").value.trim()||"Otro") : currentTipo;
+  const esTablet = tipoFinal==="Tablet";
+  var selVars=esTablet?getChecked("varsGrid"):[];
+  var selStudies=esTablet?getChecked("studiesGrid"):[];
+  var selApps={}; if(esTablet) APPS.forEach(a=>selApps[a.id]=$(a.id).value);
+  var prev=editId?tablets.find(t=>t.id===editId):null;
+  var bit=prev?[...(prev.bitacora||[])]:[{fecha:today(),evento:`✅ ${tipoFinal} registrado/a.`}];
+  if(prev){
+    if(prev.estado!==nuevoEst)bit.push({fecha:today(),evento:`🔁 Estado: "${prev.estado}" → "${nuevoEst}".`});
+    if((prev.asignado||"").toLowerCase()!==asignado.toLowerCase())bit.push({fecha:today(),evento:`👤 Reasignado/a a "${asignado}".`});
+    var fd=$("fFdano").value,fr=$("fFrep").value,fb=$("fBateria").value;
+    if(fd&&fd!==prev.fdano)bit.push({fecha:today(),evento:`⚠️ Daño: ${fmt(fd)}.`});
+    if(fr&&fr!==prev.frep)bit.push({fecha:today(),evento:`🔧 Reparación: ${fmt(fr)}.`});
+    if(esTablet&&fb!==""&&String(fb)!==String(prev.bateria))bit.push({fecha:today(),evento:`🔋 Batería: ${fb}%.`});
+    if(!esTablet&&$("fCalib").value&&$("fCalib").value!==prev.fcalib)bit.push({fecha:today(),evento:`🔧 Calibración: ${fmt($("fCalib").value)}.`});
+    if(esTablet){
+      if((prev.vars||[]).join()!==selVars.join())bit.push({fecha:today(),evento:`🔬 Variables actualizadas.`});
+      if((prev.studies||[]).join()!==selStudies.join())bit.push({fecha:today(),evento:`📂 Estudios actualizados.`});
+      APPS.forEach(a=>{if((prev.apps?.[a.id]||"No")!==selApps[a.id])bit.push({fecha:today(),evento:`📲 ${a.label}: ${prev.apps?.[a.id]||"No"} → ${selApps[a.id]}.`});});
+    }
+  }
+  var data={id:editId||Date.now().toString(),tipo:tipoFinal,tipoCustom:currentTipo==="Otro"?$("fTipoOtro").value.trim():"",
+    marca,serie,asignado,
+    modelo:$("fModelo").value.trim(),area:$("fArea").value.trim(),
+    ubicacion:$("fUbicacion").value.trim(),obs:$("fObs").value.trim(),
+    estado:nuevoEst,
+    // Tablet-specific
+    bateria:esTablet?$("fBateria").value:"",
+    vars:selVars,studies:selStudies,apps:selApps,
+    acc:esTablet?{cargador:$("aCargEst").value,cargDesc:$("aCargDesc").value.trim(),
+         lapiz:$("aLapEst").value,lapDesc:$("aLapDesc").value.trim(),
+         funda:$("aFundEst").value,fundDesc:$("aFundDesc").value.trim()}:{},
+    correo:esTablet?$("fCorreo").value.trim():"",
+    password:esTablet?$("fPassword").value.trim():"",
+    pin:esTablet?$("fPin").value.trim():"",
+    // Equipment-specific
+    fcalib:!esTablet?$("fCalib").value:"",
+    fproxcalib:!esTablet?$("fProxCalib").value:"",
+    labUbicacion:!esTablet?$("fLabUbic").value.trim():"",
+    accesoriosEquipo:!esTablet?$("fAccesoriosEquipo").value.trim():"",
+    // Common dates
+    fcompra:$("fFcompra").value,fgarantia:$("fFgarantia").value,
+    freasig:$("fFreasig").value,fdano:$("fFdano").value,frep:$("fFrep").value,
+    bitacora:bit};
+  tablets=editId?tablets.map(t=>t.id===editId?data:t):[...tablets,data];
+  $("btnSave").textContent="Guardando...";
+  await guardarNube(); closeModal(); buildTabs(); render();
+};
+
+// ─── CSV ───────────────────────────────────────────────────
+function exportCSV(){
+  if(!tablets.length){alert("No hay datos.");return;}
+  var cols=["Tipo","Marca","Modelo","Serie","Estado","Bateria%","Asignado","Area","Ubicacion","LabUbicacion","Variables","Estudios","Dropbox","KoBoToolbox","Fieldbook","Cargador","Lapiz","Funda","F.Compra","Garantia","Reasignacion","F.Dano","F.Reparacion","F.Calibracion","F.ProxCalibracion","Correo","PIN","Accesorios","Observaciones"];
+  var rows=tablets.map(t=>[t.tipo||"Tablet",t.marca,t.modelo,t.serie,t.estado,t.bateria||"",t.asignado,t.area,t.ubicacion,t.labUbicacion||"",
+    (t.vars||[]).join("; "),(t.studies||[]).join("; "),
+    t.apps?.appDropbox||"",t.apps?.appKobo||"",t.apps?.appField||"",
+    t.acc?.cargador||"",t.acc?.lapiz||"",t.acc?.funda||"",
+    fmt(t.fcompra),fmt(t.fgarantia),fmt(t.freasig),fmt(t.fdano),fmt(t.frep),
+    fmt(t.fcalib),fmt(t.fproxcalib),
+    t.correo||"",t.pin||"",t.accesoriosEquipo||"",t.obs||""]
+    .map(v=>`"${(v||"").toString().replace(/"/g,'""')}"`).join(","));
+  var csv=[cols.join(","),...rows].join("\n");
+  var a=document.createElement("a");
+  a.href="data:text/csv;charset=utf-8,\uFEFF"+encodeURIComponent(csv);
+  a.download="inventario_equipos.csv"; a.click();
+}
+
+// ─── ESTUDIOS ──────────────────────────────────────────────
 function openStudiesPanel(){renderSP();$("spOverlay").classList.add("active");}
 function closeStudiesPanel(){$("spOverlay").classList.remove("active");}
 function renderSP(){
@@ -394,6 +644,7 @@ function addStudy(){var v=$("spInput").value.trim();if(!v)return;if(studies.incl
 function delStudy(i){if(!confirm("¿Eliminar?"))return;studies.splice(i,1);persistStudies();renderSP();}
 $("spInput").addEventListener("keydown",e=>{if(e.key==="Enter")addStudy();});
 
+// ─── CHECKBOXES ────────────────────────────────────────────
 function buildCBGrid(containerId,items,selected){
   var g=$(containerId); g.innerHTML="";
   if(!items.length){g.innerHTML=`<p style="font-size:.78rem;color:#94a3b8;grid-column:1/-1;padding:6px 0">No hay elementos. Agrega desde 📂 Estudios.</p>`;return;}
@@ -407,86 +658,7 @@ function buildCBGrid(containerId,items,selected){
 }
 function getChecked(gridId){return Array.from(document.querySelectorAll(`#${gridId} input[type=checkbox]:checked`)).map(c=>c.value);}
 
-function openModal(id){
-  editId=id||null; var t=id?tablets.find(x=>x.id===id):{};
-  $("modalTitle").textContent=id?"Editar Tablet":"Nueva Tablet";
-  $("btnSave").textContent=id?"Guardar cambios":"Registrar tablet";
-  $("fMarca").value=t.marca||""; $("fModelo").value=t.modelo||"";
-  $("fSerie").value=t.serie||""; $("fAsignado").value=t.asignado||"";
-  $("fArea").value=t.area||"";   $("fUbicacion").value=t.ubicacion||"";
-  $("fObs").value=t.obs||"";     $("fEstado").value=t.estado||"Bueno";
-  $("fBateria").value=t.bateria!==undefined?t.bateria:"";
-  $("aCargEst").value=t.acc?.cargador||"Si"; $("aCargDesc").value=t.acc?.cargDesc||"";
-  $("aLapEst").value=t.acc?.lapiz||"Si";     $("aLapDesc").value=t.acc?.lapDesc||"";
-  $("aFundEst").value=t.acc?.funda||"Si";    $("aFundDesc").value=t.acc?.fundDesc||"";
-  APPS.forEach(a=>$(a.id).value=t.apps?.[a.id]||"No");
-  $("fCorreo").value=t.correo||""; $("fPassword").value=t.password||""; $("fPin").value=t.pin||"";
-  $("fFcompra").value=t.fcompra||""; $("fFgarantia").value=t.fgarantia||"";
-  $("fFreasig").value=t.freasig||""; $("fFdano").value=t.fdano||""; $("fFrep").value=t.frep||"";
-  buildCBGrid("varsGrid",VARS,t.vars||[]);
-  buildCBGrid("studiesGrid",studies,t.studies||[]);
-  $("overlay").classList.add("active"); $("fMarca").focus();
-}
-function closeModal(){$("overlay").classList.remove("active");editId=null;}
-function openEdit(id){openModal(id);}
-
-async function del(id){
-  if(!confirm("¿Eliminar este registro?"))return;
-  tablets=tablets.filter(t=>t.id!==id);
-  await guardarNube(); render();
-}
-
-$("btnSave").onclick=async function(){
-  var marca=$("fMarca").value.trim(),serie=$("fSerie").value.trim(),asignado=$("fAsignado").value.trim();
-  if(!marca||!serie||!asignado){alert("Marca, serie y persona asignada son requeridos.");return;}
-  var nuevoEst=$("fEstado").value;
-  var selVars=getChecked("varsGrid"),selStudies=getChecked("studiesGrid");
-  var selApps={}; APPS.forEach(a=>selApps[a.id]=$(a.id).value);
-  var prev=editId?tablets.find(t=>t.id===editId):null;
-  var bit=prev?[...(prev.bitacora||[])]:[{fecha:today(),evento:"✅ Tablet registrada."}];
-  if(prev){
-    if(prev.estado!==nuevoEst)bit.push({fecha:today(),evento:`🔁 Estado: "${prev.estado}" → "${nuevoEst}".`});
-    if((prev.asignado||"").toLowerCase()!==asignado.toLowerCase())bit.push({fecha:today(),evento:`👤 Reasignada a "${asignado}".`});
-    var fd=$("fFdano").value,fr=$("fFrep").value,fb=$("fBateria").value;
-    if(fd&&fd!==prev.fdano)bit.push({fecha:today(),evento:`⚠️ Daño: ${fmt(fd)}.`});
-    if(fr&&fr!==prev.frep)bit.push({fecha:today(),evento:`🔧 Reparación: ${fmt(fr)}.`});
-    if(fb!==""&&String(fb)!==String(prev.bateria))bit.push({fecha:today(),evento:`🔋 Batería: ${fb}%.`});
-    if((prev.vars||[]).join()!==selVars.join())bit.push({fecha:today(),evento:`🔬 Variables actualizadas.`});
-    if((prev.studies||[]).join()!==selStudies.join())bit.push({fecha:today(),evento:`📂 Estudios actualizados.`});
-    APPS.forEach(a=>{if((prev.apps?.[a.id]||"No")!==selApps[a.id])bit.push({fecha:today(),evento:`📲 ${a.label}: ${prev.apps?.[a.id]||"No"} → ${selApps[a.id]}.`});});
-  }
-  var data={id:editId||Date.now().toString(),marca,serie,asignado,
-    modelo:$("fModelo").value.trim(),area:$("fArea").value.trim(),
-    ubicacion:$("fUbicacion").value.trim(),obs:$("fObs").value.trim(),
-    estado:nuevoEst,bateria:$("fBateria").value,vars:selVars,studies:selStudies,apps:selApps,
-    acc:{cargador:$("aCargEst").value,cargDesc:$("aCargDesc").value.trim(),
-         lapiz:$("aLapEst").value,lapDesc:$("aLapDesc").value.trim(),
-         funda:$("aFundEst").value,fundDesc:$("aFundDesc").value.trim()},
-    fcompra:$("fFcompra").value,fgarantia:$("fFgarantia").value,
-    freasig:$("fFreasig").value,fdano:$("fFdano").value,frep:$("fFrep").value,
-    correo:$("fCorreo").value.trim(),password:$("fPassword").value.trim(),pin:$("fPin").value.trim(),
-    bitacora:bit};
-  tablets=editId?tablets.map(t=>t.id===editId?data:t):[...tablets,data];
-  $("btnSave").textContent="Guardando...";
-  await guardarNube(); closeModal(); render();
-};
-
-function exportCSV(){
-  if(!tablets.length){alert("No hay datos.");return;}
-  var cols=["Marca","Modelo","Serie","Estado","Bateria%","Asignado","Area","Ubicacion","Variables","Estudios","Dropbox","KoBoToolbox","Fieldbook","Cargador","Lapiz","Funda","F.Compra","Garantia","Reasignacion","F.Dano","F.Reparacion","Correo","PIN","Observaciones"];
-  var rows=tablets.map(t=>[t.marca,t.modelo,t.serie,t.estado,t.bateria,t.asignado,t.area,t.ubicacion,
-    (t.vars||[]).join("; "),(t.studies||[]).join("; "),
-    t.apps?.appDropbox||"No",t.apps?.appKobo||"No",t.apps?.appField||"No",
-    t.acc?.cargador,t.acc?.lapiz,t.acc?.funda,
-    fmt(t.fcompra),fmt(t.fgarantia),fmt(t.freasig),fmt(t.fdano),fmt(t.frep),
-    t.correo||"",t.pin||"",t.obs||""]
-    .map(v=>`"${(v||"").toString().replace(/"/g,'""')}"`).join(","));
-  var csv=[cols.join(","),...rows].join("\n");
-  var a=document.createElement("a");
-  a.href="data:text/csv;charset=utf-8,\uFEFF"+encodeURIComponent(csv);
-  a.download="inventario_tablets.csv"; a.click();
-}
-
+// ─── EVENTOS ───────────────────────────────────────────────
 $("btnAgregar").onclick=()=>openModal();
 $("btnCancel").onclick=closeModal;
 $("overlay").onclick=e=>{if(e.target===$("overlay"))closeModal();};
