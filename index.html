@@ -180,10 +180,11 @@ textarea{resize:none;height:56px}
 </div>
 
 <header>
-  <div><h1>📦 Inventario de Equipos</h1><p id="headerSub">Personal en Campo</p></div>
+  <div><h1>📦 Inventario de Equipos</h1><p id="headerSub">Cargando...</p></div>
   <div class="hbtns">
     <button class="hbtn sec" onclick="openStudiesPanel()">📂 Estudios</button>
     <button class="hbtn" id="btnAgregar">+ Agregar</button>
+    <button class="hbtn sec" onclick="cerrarSesion()" title="Cerrar sesión">🔒 Salir</button>
   </div>
 </header>
 
@@ -496,7 +497,7 @@ function render(){
     const mq=!q||["marca","modelo","serie","asignado","area","ubicacion","tipo"].some(f=>(t[f]||"").toLowerCase().includes(q));
     return mq&&(!est||t.estado===est);
   });
-  $("headerSub").textContent=`Personal en Campo · ${tablets.length} equipo${tablets.length!==1?"s":""}`;
+  $("headerSub").textContent=`${tablets.length} equipo${tablets.length!==1?"s":""}`;
   $("sBueno").textContent  =base.filter(t=>t.estado==="Bueno").length;
   $("sRegular").textContent=base.filter(t=>t.estado==="Regular").length;
   $("sDanado").textContent =base.filter(t=>t.estado==="Dañado").length;
@@ -744,6 +745,13 @@ function buildCBGrid(containerId,items,selected){
   });
 }
 function getChecked(gridId){return Array.from(document.querySelectorAll(`#${gridId} input[type=checkbox]:checked`)).map(c=>c.value);}
+
+// ─── CERRAR SESIÓN ─────────────────────────────────────────
+function cerrarSesion(){
+  if(!confirm("¿Cerrar sesión?")) return;
+  sessionStorage.removeItem(KEY_AUTH);
+  location.reload();
+}
 
 // ─── EVENTOS ───────────────────────────────────────────────
 $("btnAgregar").onclick=()=>openModal();
