@@ -149,11 +149,36 @@ textarea{resize:none;height:56px}
 .sp-footer{display:flex;justify-content:flex-end;margin-top:14px}
 
 #syncBadge{position:fixed;bottom:20px;right:20px;background:#1e293b;color:white;padding:10px 16px;border-radius:10px;font-size:.78rem;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,.2);transition:opacity .5s;display:none}
+
+/* LOGIN */
+#loginScreen{display:flex;position:fixed;inset:0;background:#4338ca;z-index:9999;align-items:center;justify-content:center;padding:16px}
+.login-box{background:white;border-radius:20px;padding:36px 32px;width:100%;max-width:360px;box-shadow:0 12px 40px rgba(0,0,0,.25);text-align:center}
+.login-logo{font-size:2.8rem;margin-bottom:8px}
+.login-box h1{font-size:1.2rem;font-weight:800;color:#1e293b;margin-bottom:4px}
+.login-box p{font-size:.8rem;color:#64748b;margin-bottom:24px}
+.login-box input{width:100%;border:1px solid #e2e8f0;border-radius:10px;padding:10px 14px;font-size:1rem;outline:none;text-align:center;letter-spacing:.12em;font-family:inherit;margin-bottom:10px}
+.login-box input:focus{border-color:#6366f1;box-shadow:0 0 0 3px #e0e7ff}
+.login-btn{width:100%;padding:11px;border-radius:10px;border:none;background:#4338ca;color:white;font-weight:700;font-size:.95rem;cursor:pointer}
+.login-btn:hover{background:#3730a3}
+.login-err{font-size:.78rem;color:#dc2626;margin-top:8px;min-height:18px;font-weight:600}
 @media print{body>*{display:none!important}.pzone{display:flex!important;flex-direction:column;align-items:center;justify-content:center;position:fixed;inset:0;background:white;padding:30px}.pzone *{visibility:visible}}
 @media(max-width:560px){.stats{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}.card-main{flex-direction:column}.card-actions{width:100%}.acc-row{flex-wrap:wrap}.cb-grid{grid-template-columns:1fr}.tipo-selector{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">📦</div>
+    <h1>Inventario de Equipos</h1>
+    <p>Semilla Nueva · Ingresa tu clave de acceso</p>
+    <input id="loginInput" type="password" placeholder="••••••••" autocomplete="off"/>
+    <button class="login-btn" onclick="intentarLogin()">Ingresar</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
 <header>
   <div><h1>📦 Inventario de Equipos</h1><p id="headerSub">Personal en Campo</p></div>
   <div class="hbtns">
@@ -322,6 +347,65 @@ textarea{resize:none;height:56px}
 <div id="syncBadge"></div>
 
 <script>
+// ─── LOGIN ─────────────────────────────────────────────────
+const KEY_AUTH = "inv_auth";
+let claveRemota = null; // se carga desde JSONBin, nunca en código
+
+async function cargarClave(){
+  try {
+    const r = await fetch(BASE+"/latest",{headers:{"X-Master-Key":API_KEY}});
+    const d = await r.json();
+    claveRemota = d.record?.config?.clave || null;
+    // Si no existe config aún, la inicializamos con la clave por defecto
+    if(!d.record?.config){
+      await fetch(BASE,{method:"PUT",headers:HEADERS,
+        body:JSON.stringify({tablets: d.record?.tablets||[], config:{clave:"inv2026@"}})});
+      claveRemota = "inv2026@";
+    }
+  } catch(e){
+    claveRemota = null;
+    document.getElementById("loginErr").textContent = "⚠️ Sin conexión. Intenta más tarde.";
+  }
+}
+
+function verificarSesion(){
+  return sessionStorage.getItem(KEY_AUTH)==="ok";
+}
+
+async function intentarLogin(){
+  const val = document.getElementById("loginInput").value;
+  const err = document.getElementById("loginErr");
+  const btn = document.querySelector(".login-btn");
+  if(!claveRemota){
+    err.textContent="⚠️ No se pudo cargar la configuración. Recarga la página.";
+    return;
+  }
+  if(val === claveRemota){
+    sessionStorage.setItem(KEY_AUTH,"ok");
+    document.getElementById("loginScreen").style.display="none";
+    document.getElementById("loginInput").value="";
+    cargarNube();
+  } else {
+    err.textContent="Clave incorrecta. Intenta nuevamente.";
+    document.getElementById("loginInput").value="";
+    document.getElementById("loginInput").focus();
+    setTimeout(()=>err.textContent="",3000);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", async ()=>{
+  document.getElementById("loginInput").addEventListener("keydown",e=>{
+    if(e.key==="Enter") intentarLogin();
+  });
+  if(verificarSesion()){
+    document.getElementById("loginScreen").style.display="none";
+    cargarNube();
+  } else {
+    // Pre-cargar la clave en segundo plano mientras el usuario escribe
+    await cargarClave();
+  }
+});
+
 const BIN_ID  = "699dc73743b1c97be999f46f";
 const API_KEY = "$2a$10$sIxUKUhDKyvNvhdedW2XX.rYODI2GsngOLf.XWGOWlFQEcrQrIRga";
 const BASE    = "https://api.jsonbin.io/v3/b/" + BIN_ID;
@@ -362,7 +446,6 @@ async function cargarNube() {
     const r = await fetch(BASE+"/latest",{headers:{"X-Master-Key":API_KEY}});
     const d = await r.json();
     tablets = d.record.tablets || [];
-    // Retrocompatibilidad: tablets antiguas sin campo "tipo" → asignarles "Tablet"
     tablets = tablets.map(t => ({...t, tipo: t.tipo || "Tablet"}));
   } catch(e) { tablets=[]; showSync("⚠️ Sin conexión","#dc2626"); }
   buildTabs();
@@ -371,7 +454,11 @@ async function cargarNube() {
 
 async function guardarNube() {
   try {
-    await fetch(BASE,{method:"PUT",headers:HEADERS,body:JSON.stringify({tablets})});
+    // Leer registro completo para preservar config
+    const r = await fetch(BASE+"/latest",{headers:{"X-Master-Key":API_KEY}});
+    const d = await r.json();
+    const config = d.record?.config || {clave:"inv2026@"};
+    await fetch(BASE,{method:"PUT",headers:HEADERS,body:JSON.stringify({tablets, config})});
     showSync("✅ Guardado en la nube");
   } catch(e) { showSync("⚠️ Sin internet - no se pudo guardar","#dc2626"); }
 }
@@ -666,8 +753,6 @@ $("qrOverlay").onclick=e=>{if(e.target===$("qrOverlay"))closeQR();};
 $("spOverlay").onclick=e=>{if(e.target===$("spOverlay"))closeStudiesPanel();};
 $("search").oninput=render;
 $("filtroEstado").onchange=render;
-
-cargarNube();
 </script>
 </body>
 </html>
