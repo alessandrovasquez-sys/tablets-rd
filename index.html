@@ -377,7 +377,7 @@ footer{text-align:center;font-size:11px;color:var(--sub);
       <div id="fungus-banner" style="margin-top:10px;border-radius:8px;padding:8px 12px;font-size:11px;font-weight:600;line-height:1.5"></div>
     </div></div>
     
-    </div>
+
     <div class="panels r2">
       <div class="panel">
         <div class="ph"><span class="pt">&#129397; &Iacute;ndice de calor diario (m&aacute;ximo)</span></div>
@@ -803,7 +803,7 @@ function aggregateByMonth(D) {
 
 // ── Destruye charts ────────────────────────────────────────────────
 function destroyCharts() {
-  ['cS','cT','cR','cW','cH','cRMonth','cCmpT','cCmpR','cCmpRmonth','cCmpGDD','cWindRose','cDew','cHeat','cGDD'].forEach(id => {
+  ['cS','cT','cR','cW','cH','cRMonth','cCmpT','cCmpR','cCmpRMonth','cCmpGDD','cWindRose','cDew','cHeat','cGDD'].forEach(id => {
     if(chartRefs[id]){chartRefs[id].destroy();delete chartRefs[id];}
   });
 }
@@ -964,7 +964,7 @@ function setStation(st) {
 // ── Renderiza dashboard principal ──────────────────────────────────
 function renderDashboard(rows, stationRowsRaw) {
   rows = rows.filter(r=>r['Dia']&&parseDiaParts(r['Dia'])&&r['Temperatura (C)']&&!isNaN(parseFloat(r['Temperatura (C)'])));
-  stationRowRaw = (stationRowsRaw || rows).filter(r=>r['Dia']&&parseDiaParts(r['Dia'])&&['Temperatura (C)']&&!isNan(parseFloat(r['Temperatura (C)'])));
+  stationRowsRaw = (stationRowsRaw || rows).filter(r=>r['Dia']&&parseDiaParts(r['Dia'])&&r['Temperatura (C)']&&!isNaN(parseFloat(r['Temperatura (C)'])));
   document.getElementById('picker').style.display = 'none';
   if(!rows.length){ showNoData(); return; }
   hideNoData();
@@ -982,7 +982,7 @@ function renderDashboard(rows, stationRowsRaw) {
   });
 
   const D = aggregateByDay(rows);
-  const dl = D.map(d=>d.dia);
+  const dL = D.map(d=>d.dia);
 
   const detailFiltered = applyDetailFilter(stationRowsRaw);
   let Ddetail = null, detailNoMatch = false;
@@ -991,7 +991,7 @@ function renderDashboard(rows, stationRowsRaw) {
     else detailNoMatch = true;
   }
   if(!Ddetail) Ddetail = D;
-  const dLdtail = Ddetail.map(d=>d.dia);
+  const dLdetail = Ddetail.map(d=>d.dia);
   
   const totR = D.reduce((a,d)=>a+d.rain,0).toFixed(1);
   const tMax = Math.max(...tsT).toFixed(1);
@@ -1065,18 +1065,18 @@ function renderDashboard(rows, stationRowsRaw) {
       yH:{position:'right',grid:{display:false},ticks:{color:isAllStations?TC:clr.hum,font:{size:9},callback:v=>v+'%'},min:35,max:100}}
   }});
 
-  chartRefs['cT']=new Chart('cT',{data:{labels:dL,datasets:[
-    {type:'bar',data:D.map(d=>[d.tmin,d.tmax]),backgroundColor:clr.light,
+  chartRefs['cT']=new Chart('cT',{data:{labels:dLdetail,datasets:[
+    {type:'bar',data:Ddetail.map(d=>[d.tmin,d.tmax]),backgroundColor:clr.light,
      borderColor:clr.border,borderWidth:1,borderRadius:4,order:2},
-    {type:'line',data:D.map(d=>d.tavg),borderColor:clr.main,borderWidth:2.5,
-     pointRadius:D.map(d=>d.altSource?6:5),
-     pointBackgroundColor:D.map(d=>d.altSource?'#fff':clr.main),
-     pointBorderColor:clr.main, pointBorderWidth:D.map(d=>d.altSource?2.5:0),
+    {type:'line',data:Ddetail.map(d=>d.tavg),borderColor:clr.main,borderWidth:2.5,
+     pointRadius:Ddetail.map(d=>d.altSource?6:5),
+     pointBackgroundColor:Ddetail.map(d=>d.altSource?'#fff':clr.main),
+     pointBorderColor:clr.main, pointBorderWidth:Ddetail.map(d=>d.altSource?2.5:0),
      tension:0,order:1}
   ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},
     tooltip:{callbacks:{label:c=>{
       if(c.datasetIndex===0) return ` Rango ${c.raw[0]}–${c.raw[1]}°C`;
-      const d = D[c.dataIndex];
+      const d = Ddetail[c.dataIndex];
       return d.altSource ? ` Prom ${c.parsed.y}°C · ⚠ fuente alterna (${d.fuente})` : ` Prom ${c.parsed.y}°C`;
     }}}},
     scales:{x:{grid:{color:GC},ticks:XT},y:{grid:{color:GC},
@@ -1122,10 +1122,10 @@ function renderDashboard(rows, stationRowsRaw) {
       scales:{x:{grid:{display:false},ticks:XT},
         y:{grid:{color:GC},ticks:{color:TC,font:{size:9},callback:v=>v+' km/h'},min:0}}}});
 
-  chartRefs['cH']=new Chart('cH',{data:{labels:dL,datasets:[
-    {type:'bar',data:D.map(d=>[d.hmin,d.hmax]),backgroundColor:'rgba(31,127,223,.12)',
+  chartRefs['cH']=new Chart('cH',{data:{labels:dLdetail,datasets:[
+    {type:'bar',data:Ddetail.map(d=>[d.hmin,d.hmax]),backgroundColor:'rgba(31,127,223,.12)',
      borderColor:'rgba(31,127,223,.35)',borderWidth:1,borderRadius:4,order:2},
-    {type:'line',data:D.map(d=>d.havg),borderColor:clr.hum,borderWidth:2.5,
+    {type:'line',data:Ddetail.map(d=>d.havg),borderColor:clr.hum,borderWidth:2.5,
      pointRadius:5,pointBackgroundColor:clr.hum,tension:0,order:1}
   ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},
     tooltip:{callbacks:{label:c=>c.datasetIndex===0?` Rango ${c.raw[0]}–${c.raw[1]}%`:` Prom ${c.parsed.y}%`}}},
